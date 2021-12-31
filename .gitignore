@@ -1,0 +1,14 @@
+.vscode
+.DS_Store
+node_modules
+
+lib
+lib-esm
+_bundles
+
+# Builder
+playground
+.temp
+.cache
+
+website/docs/reference

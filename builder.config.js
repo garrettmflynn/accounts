@@ -1,7 +1,6 @@
 // ./builder.config.js
 const { join, resolve } = require('path');
 const { runNodejs, browserPlay, nodejsPlay, devNodejs, devBrowser } = require('build-dev');
-const { configEnv } = require('./src/common/utils.cjs');
 
 
 const browserOptions = {
@@ -36,10 +35,8 @@ function run([type]) {
 
         case 'dev:nodejs':
 
-            // const envVars = configEnv(resolve(__dirname, './development.env'));
-            // if (!envVars) throw new Error('No environment variables initialized...');
-
-            return devNodejs(nodeOptions);
+            // return devNodejs(nodeOptions);
+            return runNodejs({ entryFile: './src/backend/main', nodeArgs: ['development'] });
 
         case 'dev':
             run(['dev:browser'])

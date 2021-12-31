@@ -1,6 +1,6 @@
-const {config}  = require('dotenv')
+import {config} from 'dotenv'
 
-exports.configEnv = function configEnv(path) {
+export const configEnv = function configEnv(path:string) {
     const { error, parsed } = config({ path });
 
     if (error) {

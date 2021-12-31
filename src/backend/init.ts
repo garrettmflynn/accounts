@@ -5,11 +5,11 @@ import fetch from "node-fetch";
 (globalThis as any).fetch = fetch;
 
 import { resolve } from 'path';
-import { configEnv } from '../common/utils.cjs';
+import { configEnv } from '../common/utils';
 
 // configEnv(resolve(__dirname, '../DEV.env'));
 
-if (process.env.ENV !== 'PROD') configEnv(resolve(__dirname, '../.key'));  
+if (process.env.ENV !== 'PROD') configEnv(resolve(__dirname, '../../.key'));  
 
 const [arg1] = process.argv.slice(2);
 if (process.env.ENV === 'PROD' || arg1 === 'CHECK_ENV') {

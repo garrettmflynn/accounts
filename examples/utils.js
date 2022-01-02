@@ -1,6 +1,6 @@
 import {config} from 'dotenv'
 
-export const configEnv = function configEnv(path:string) {
+export const configEnv = function configEnv(path) {
     const { error, parsed } = config({ path });
 
     if (error) {

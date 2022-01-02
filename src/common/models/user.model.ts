@@ -26,14 +26,9 @@ export const UserModelType = 'USER';
 export class UserObj extends BaseObj<typeof UserModelType> {
 
 
-    // UserPlatform Requirements
     id: string = ""
-    // ownerId: string = ""
-    parentId: string = ""
-    structIds: string[] = []
-    // structType: string = ""
 
-    // Original Requirements
+    // Default User Information
     email: string = '';
     username: string = '';
     userRoles: string[] = [];
@@ -41,19 +36,13 @@ export class UserObj extends BaseObj<typeof UserModelType> {
     firstName: string = '';
     lastName: string = '';
     fullName: string = '';
-    status: UserStatus = UserStatus.unregistered;
     pictureUrl: string | null = null;
-    sex: 'male' | 'female' = 'male';
-    birthday: string = '';
 
-    /** Notes about client */
-    clientInfo: string = '';
+    // Custom User Data
+    customUserData: {
+        [x : string] : any
+    } = {'test': 0}
 
-    /**
-     * Obj with fitbit access_token, fitbit user_id, and when the token expires.
-     * `null` indicates the users fitbit data hasn't been authorized on this account yet.
-     */
-    fitbit: null | UserFitbit = null;
 
     /** eg:
      * ```ts
@@ -64,8 +53,6 @@ export class UserObj extends BaseObj<typeof UserModelType> {
      * ``` */
     identities: { id: string, peerType: string }[] = [];
 
-    /** A list of client/patients associated with the user for 'peer' role */
-    clients?: string[];
     
     constructor(p?: Partial<UserObj>) {
         super(UserModelType, p);

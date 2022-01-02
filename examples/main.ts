@@ -1,19 +1,14 @@
-import "./init";
+import "./init.js";
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
 import mongoose, { Mongoose } from 'mongoose';
-import { initRoutes } from "./controllers/init-routes";
+import { initRoutes } from "../src/backend/controllers/init-routes";
 import bodyParser from 'body-parser';
-import { getDbURI } from "./utils/general.util";
-import { configEnv } from "src/common/utils";
-import {resolve} from 'path'
-const [arg1, arg2] = process.argv.slice(2)
-const envVars = configEnv(resolve(__dirname, `../../${arg1}.env`));
-if (!envVars) throw new Error('No environment variables initialized...');
-console.log(envVars)
+import { getDbURI } from "../src/backend/utils/general.util";
+import * as api from '../src/backend'
 
 const { env } = process;
 const app = express();
@@ -65,24 +60,13 @@ async function run(mongoose?: Mongoose) {
     }
     
     
-    if (mongoose) {
-        app.set('mongoose', mongoose.connection.db);
-    }
+    if (mongoose) app.set('mongoose', mongoose.connection.db);
 
     server.listen(parseInt(port), () => {
       console.log(`Websocket server created on ${protocol}://${`localhost`}:${port}`)
     });
     // Set Routes
     const router = express.Router();
-
-    // handle profile requests
-    router.post("/profile", require("./controllers/profile").profile);
-    
-    
-    // handle fitbit requests
-    // const fitbitController = require("./controllers/fitbit");
-    // router.post("/fitbit", fitbitController.fitbit);
-
     app.use("/", initRoutes(router));
 
     // Start Server

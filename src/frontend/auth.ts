@@ -1,6 +1,8 @@
 import { AnyObj } from "@giveback007/util-lib";
 import { App as RealmApp, Credentials, handleAuthRedirect } from "realm-web";
 
+const ENV = 'DEV' // TODO: To remove and replace with a window variable
+
 type DefaultUserProfileData = {
     name?: string;
     email?: string;
@@ -28,31 +30,28 @@ export type RealmUser = {
     accessToken: string | null;
     refreshToken: string | null;
     /** Check if this is correct: */
-    profile: {
-        // type: 'normal' | 'server';
-        identities: { id: string; peerType: PeerType }[];
-        data: DefaultUserProfileData;
-    };// | undefined;
+    profile: DefaultUserProfileData;
+    identities: { id: string; peerType: PeerType }[];
     state: "active" | "logged-out" | "removed";
     customData: AnyObj;
 }
 
-export const Auth = new class OAuth {
-    realm = new RealmApp("buckleup-ilscy");
+    const appName = "brainsatplay-tvmdj" // change for your application in MongoDB Realm
 
-    constructor() {
-        if (window.location.href.includes('_baas_client_app_id')) {
-            handleAuthRedirect(); // Authenticates on the other tab and closes this one
-        }
+    export const app = new RealmApp(appName);
+    // const redirectUri = `${window.location.origin}/redirect`;
+    
+    if (window.location.href.includes('_baas_client_app_id')) {
+        handleAuthRedirect(); // Authenticates on the other tab and closes this one
     }
 
-    confirmUserFromURL = async (url: URL = new URL(window.location.href)) => {
+    export const confirmUserFromURL = async (url: URL = new URL(window.location.href)) => {
         const token = url.searchParams.get('token');
         const tokenId = url.searchParams.get('tokenId');
     
         if (token && tokenId) {
             try {
-                await this.realm.emailPasswordAuth.confirmUser(token, tokenId);
+                await app.emailPasswordAuth.confirmUser(token, tokenId);
                 return true; // confirmation email sent
             } catch(e) {
                 console.log("Couldn't send confirmation email", e);
@@ -63,7 +62,7 @@ export const Auth = new class OAuth {
         }
     }
 
-    completePasswordReset = async (password: string) => {
+    export const completePasswordReset = async (password: string) => {
         const params = new URLSearchParams(window.location.search);
         const token = params.get("token");
         const tokenId = params.get("tokenId");
@@ -74,7 +73,7 @@ export const Auth = new class OAuth {
         );
 
         try {
-            await this.realm.emailPasswordAuth.resetPassword(password, token, tokenId);
+            await app.emailPasswordAuth.resetPassword(password, token, tokenId);
             return true;
         } catch(e) {
             console.log("Couldn't reset password", e);
@@ -82,23 +81,23 @@ export const Auth = new class OAuth {
         }
     }
 
-    getGoogleCredentials = async () => {
+    export const getGoogleCredentials = async () => {
         return Credentials.google({ redirectUrl: location.origin });
     }
 
-    getCredentials = (auth: { email: string, pass: string}) => {
+    export const getCredentials = (auth: { email: string, pass: string}) => {
         return Credentials.emailPassword(auth.email,auth.pass);
     }
 
-    login = async (creds?: Credentials) => {
+    export const login = async (creds?: Credentials) => {
 
-        let { currentUser } = this.realm;
+        let { currentUser } = app;
         let type: 'LOG_IN' | 'REFRESH' = 'LOG_IN'
         
         // If email & pass is specified to function use credentials
         if (creds) {
             try {
-                const user = await this.realm.logIn(creds);
+                const user = await app.logIn(creds);
 
                 if (user) {
                     await user.refreshAccessToken();
@@ -139,27 +138,15 @@ export const Auth = new class OAuth {
             };
     }
 
-    logout = async () => {
-        if (!this.realm.currentUser)
+    export const logout = async () => {
+        if (!app.currentUser)
             return { type: 'FAIL' as const, data: { err: new Error('No User Logged In') } };
         
         try {
-            await this.realm.currentUser.logOut();
+            await app.currentUser.logOut();
             return { type: 'LOGOUT' as const }
         } catch(err) {
             console.log(err);
             return { type: 'FAIL' as const, data: { err: new Error('Failed to logout') } };
         }
     }
-
-    // move outside of this
-    // initWebSocketApiConnection(currentUser: User) {
-    //     // currentUser.socket = new WebsocketClient(
-    //     //     window.redirectURI, // Dependent on client, always targets ws://localhost:80
-    //     //     // SERVER_URI, // Dependent on server
-    //     //     currentUser)
-    // }
-}
-
-// MERN Stack Course - ALSO: Convert Backend to Serverless with MongoDB Realm
-// https://www.youtube.com/watch?v=mrHNSanmqQ4

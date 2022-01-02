@@ -48,5 +48,6 @@ export function userController(router: Router, rt = '/user') {
         create: true,
         patch: true,
         getAll: true,
+        deleteById: true
     });
 }

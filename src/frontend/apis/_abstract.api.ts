@@ -1,6 +1,8 @@
 import { AnyObj } from "@giveback007/util-lib";
 import { BaseObj } from "../../common/models/_base.model";
-import { getData, patchData, postData } from "../utils/fetch-methods";
+import { deleteData, getData, patchData, postData } from "../utils/fetch-methods";
+
+const SERVER_URI = 'http://localhost:4000' // TODO: To remove and replace with a window variable
 
 export const Api = <T extends AnyObj>(route: string) => {
     const routeUrl = new URL(route, SERVER_URI);
@@ -23,6 +25,9 @@ export const Api = <T extends AnyObj>(route: string) => {
 
         search: (searchParams: Partial<T>) =>
             postData<Partial<T>, T[]>(routeUrl.href + '/search', searchParams),
+
+        delete: (id: string) =>
+            deleteData<Partial<T>, T[]>(routeUrl.href  + '/' + id),
     }
 
 }

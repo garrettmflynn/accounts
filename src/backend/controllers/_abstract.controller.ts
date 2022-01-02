@@ -10,7 +10,7 @@ const errRoute = (type: string, res: Response, route: string) =>
     res.status(500).json({ message: `"${type}/" is not implemented on "${route}/"` });
 
 function handleResult(result: {
-    code: 500 | 404;
+    code: 500 | 404 | 409;
     error: any;
     message: string;
     type: 'ERROR';
@@ -32,19 +32,20 @@ export function controller(
     Model: ModelType<any>,
     route: string,
     opts: {
-        getById?:   boolean | 'ERROR';
-        getIds?:    boolean | 'ERROR';
-        getAll?:    boolean | 'ERROR';
-        search?:    boolean | 'ERROR';
-        create?:    boolean | 'ERROR';
-        update?:    boolean | 'ERROR';
-        patch?:     boolean | 'ERROR';
+        deleteById?: boolean | 'ERROR';
+        getById?:    boolean | 'ERROR';
+        getIds?:     boolean | 'ERROR';
+        getAll?:     boolean | 'ERROR';
+        search?:     boolean | 'ERROR';
+        create?:     boolean | 'ERROR';
+        update?:     boolean | 'ERROR';
+        patch?:      boolean | 'ERROR';
     }
 ) {
     
     const {
         search, getAll, patch,
-        update, getById, create, getIds
+        update, getById, create, getIds, deleteById
     } = opts;
 
     // eg: "/user/search" with 'post'
@@ -79,16 +80,26 @@ export function controller(
         if (update === 'ERROR') return errRoute('update', res, route);
 
         const { query } = req;
-        log('UPDATE:', query);
+        console.log('UPDATE:', query);
         throw new Error('not implemented');
     });
 
     // eg: "/user/614b800835a020db9fd6ed0e" with 'get'
     if (getById) router.get(`${route}/:id`, async (req, res) => {
+
         if (getById === 'ERROR') return errRoute('get by id', res, route);
 
         const { id } = req.params;
         const result = await dbUtil.getById(Model, id);
+        return handleResult(result, res);
+    });
+
+    // eg: "/user/614b800835a020db9fd6ed0e" with 'delete'
+    if (deleteById) router.delete(`${route}/:id`, async (req, res) => {
+        if (deleteById === 'ERROR') return errRoute('delete', res, route);
+
+        const { id } = req.params;
+        const result = await dbUtil.deleteById(Model, id);
         return handleResult(result, res);
     });
 

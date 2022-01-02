@@ -1,22 +1,5 @@
 // ./builder.config.js
-const { join, resolve } = require('path');
 const { runNodejs, browserPlay, nodejsPlay, devNodejs, devBrowser } = require('build-dev');
-
-
-const browserOptions = {
-    fromDir: 'src/frontend',
-    entryFile: 'index.ts',
-    toDir: '.cache/web',
-    copyFiles: ['index.html'],
-    watchOtherDirs: ['src']
-}
-
-const nodeOptions = {
-    fromDir: '/src/backend', 
-    entryFile: 'main.ts', 
-    toDir: '.cache/node' 
-}
-
 
 function run([type]) {
     switch (type) {
@@ -27,20 +10,39 @@ function run([type]) {
         case 'play:nodejs':
             return nodejsPlay();
 
-        case 'run:nodejs':
-            return runNodejs({ entryFile: './server/main' });
-
         case 'dev:browser':
-            return devBrowser(browserOptions);
+            return devBrowser({
+                fromDir: 'examples',
+                entryFile: 'index.ts',
+                toDir: '.cache/web',
+                copyFiles: ['index.html'],
+                watchOtherDirs: ['src/frontend', 'src/common']
+            });
 
         case 'dev:nodejs':
 
-            // return devNodejs(nodeOptions);
-            return runNodejs({ entryFile: './src/backend/main', nodeArgs: ['development'] });
+            // nodeOptions.nodeArgs = ['development']
+            // return devNodejs({
+            //     fromDir: 'examples', 
+            //     entryFile: 'main.ts', 
+            //     toDir: '.cache/node',
+            //     watchOtherDirs: ['src/backend', 'src/common'],
+            //     nodeArgs: ['development']
+            // });
+            return runNodejs({
+                 entryFile: './examples/main', 
+                  watchDirs: ['src/backend', 'src/common'],
+                  nodeArgs: ['development'] 
+                });
 
         case 'dev':
             run(['dev:browser'])
             run(['dev:nodejs'])
+            break;
+
+        case 'play':
+            run(['play:browser'])
+            run(['play:nodejs'])
             break;
 
         default:

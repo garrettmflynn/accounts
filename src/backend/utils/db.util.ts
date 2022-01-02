@@ -1,4 +1,5 @@
 import { hasKey } from "@giveback007/util-lib";
+import { DeleteResult } from "mongodb";
 import { Model as ModelType, Document, ObjectId } from "mongoose";
 
 /**
@@ -21,7 +22,7 @@ import { Model as ModelType, Document, ObjectId } from "mongoose";
  * 404 - Resource not found
  */
 
-export const errorObj = (error: any, code: 500 | 404) => ({
+export const errorObj = (error: any, code: 500 | 404 | 409) => ({
     code, error,
     message: (error.message || error._message || 'Error with no message') as string,
     type: 'ERROR' as const,
@@ -71,6 +72,8 @@ export class dbUtil {
     }
 
     static async patch<T = any>(Model: ModelType<any>, objId: string | ObjectId, setProps: Partial<T>) {
+
+        console.log(setProps)
         // Prevent unintentional id changes
         if (hasKey(setProps, '_id')) delete setProps._id;
             //if user has socket
@@ -96,6 +99,18 @@ export class dbUtil {
             if (!doc) return errorObj({ message: `getById: "id: ${objId}" not found`, objId }, 404);
             
             return successObj(doc, 200);
+        } catch(err: any) {
+            return errorObj(err, 500)
+        }
+    }
+
+    static async deleteById<T = any>(Model: ModelType<any>, objId: string | ObjectId) {
+        try {
+            const res: (DeleteResult) = await Model.deleteOne({_id: objId}).exec();
+            console.log(res)
+            if (!res || res.deletedCount == 0) return errorObj({ message: `deleteById: "request not acknowledged. try again.`, objId }, 409);
+            
+            return successObj(res, 200);
         } catch(err: any) {
             return errorObj(err, 500)
         }

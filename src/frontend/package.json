@@ -1,0 +1,28 @@
+{
+  "name": "@brainsatplay/accounts-browser",
+  "version": "0.0.3",
+  "description": "FOSS account management system for the Brains@Play ecosystem",
+  "main": "./dist/frontend/index.js",
+  "types": "./dist/frontend/index.d.ts",
+  "scripts": {
+    "start": "cd .. && yarn run frontend",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brainsatplay/accounts.git"
+  },
+  "author": "Garrett Flynn",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/brainsatplay/accounts/issues"
+  },
+  "homepage": "https://github.com/brainsatplay/accounts#readme",
+  "devDependencies": {
+    "@brainsatplay/accounts-common": "*"
+  },
+  "dependencies": {
+    "@giveback007/util-lib": "^0.23.1",
+    "realm-web": "^1.5.1"
+  }
+}

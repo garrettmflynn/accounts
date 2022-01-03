@@ -1,6 +1,6 @@
 {
   "name": "@brainsatplay/accounts-browser",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "FOSS account management system for the Brains@Play ecosystem",
   "main": "./dist/frontend/index.js",
   "types": "./dist/frontend/index.d.ts",

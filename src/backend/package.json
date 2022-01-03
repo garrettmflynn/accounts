@@ -1,0 +1,37 @@
+{
+  "name": "@brainsatplay/accounts-node",
+  "version": "0.0.2",
+  "description": "FOSS account management system for the Brains@Play ecosystem",
+  "main": "../../dist/backend/index.js",
+  "types": "../../dist/backend/index.d.ts",
+  "scripts": {
+    "start": "cd .. && yarn run backend",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brainsatplay/accounts.git"
+  },
+  "author": "Garrett Flynn",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/brainsatplay/accounts/issues"
+  },
+  "homepage": "https://github.com/brainsatplay/accounts#readme",
+  "devDependencies": {
+    "@brainsatplay/accounts-common": "*",
+    "@types/body-parser": "^1.19.2",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/mongoose": "^5.11.97"
+  },
+  "dependencies": {
+    "@giveback007/util-lib": "^0.23.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "mongodb": "^4.2.2",
+    "mongoose": "^6.1.4",
+    "node-fetch": "^3.1.0"
+  }
+}

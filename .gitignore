@@ -1,7 +1,7 @@
 .vscode
 .DS_Store
 node_modules
-.key
+*.key
 
 lib
 lib-esm
@@ -15,4 +15,4 @@ playground
 website/docs/reference
 
 # Library Builds
-**/dist/**
+**/dist

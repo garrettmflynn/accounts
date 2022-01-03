@@ -1,0 +1,11 @@
+{
+  "name": "@brainsatplay/accounts-common",
+  "version": "0.0.1",
+  "main": "../../dist/common/index.js",
+  "types": "../../dist/common/index.d.ts",  
+  "author": "Garrett Flynn",
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "@giveback007/util-lib": "^0.23.0"
+  }
+}

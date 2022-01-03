@@ -27,20 +27,13 @@ export type RealmUser = {
     accessToken: string | null;
     refreshToken: string | null;
     /** Check if this is correct: */
-    profile: {
-        // type: 'normal' | 'server';
-        identities: { id: string; peerType: PeerType }[];
-        data: DefaultUserProfileData;
-    };// | undefined;
+    profile: DefaultUserProfileData;
+    identities: { id: string; peerType: PeerType }[];
     state: "active" | "logged-out" | "removed";
     customData: AnyObj;
 }
 
-export type AccountInfoType =  {
-    email: string, 
-    password?: string
-    id_token?: string
-}
+export type AccountInfoType =  Realm.Auth.RegisterUserDetails
 
 export type AccountConfirmationType =  {
     token: string

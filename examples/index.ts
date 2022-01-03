@@ -1,23 +1,26 @@
-import * as accounts from '../src/frontend'
+// import * as accounts from '../src/frontend'
+import AccountsAPI from '../src/frontend/dist/frontend'
 
-let sigupButton = document.getElementById('signup');
-let loginButton = document.getElementById('login');
-let googleButton = document.getElementById('google');
-let updateButton = document.getElementById('update');
-let logoutButton = document.getElementById('logout');
-let deleteButton = document.getElementById('delete');
+const accounts = new AccountsAPI("brainsatplay-tvmdj")
 
-let profileImage = document.getElementById('profile-image') as HTMLImageElement
-let fullName = document.getElementById('full-name');
-let customUserData = document.getElementById('custom-user-data');
+const sigupButton = document.getElementById('signup');
+const loginButton = document.getElementById('login');
+const googleButton = document.getElementById('google');
+const updateButton = document.getElementById('update');
+const logoutButton = document.getElementById('logout');
+const deleteButton = document.getElementById('delete');
 
-let testUserDetails = {
-    email: 'gflynn@usc.edu',
+const profileImage = document.getElementById('profile-image') as HTMLImageElement
+const fullName = document.getElementById('full-name');
+const customUserData = document.getElementById('custom-user-data');
+
+const testUserDetails = {
+    email: 'test@gmail.com',
     password: 'testingThis'
 }
 
 
-let setProfileInfo = (res:any) => {
+const setProfileInfo = (res:any) => {
     if (!('err' in res.data)){
         if (profileImage) profileImage.src = res.data.pictureUrl
         if (fullName) fullName.innerHTML = res.data.fullName
@@ -82,7 +85,7 @@ if (logoutButton){
 // Set Disconnection Command
 if (deleteButton){
     deleteButton.onclick = () => {
-        accounts.remove().then(() => {
+        accounts.delete().then(() => {
             console.log('Deleted account!')
         })
     }

@@ -73,7 +73,6 @@ export class dbUtil {
 
     static async patch<T = any>(Model: ModelType<any>, objId: string | ObjectId, setProps: Partial<T>) {
 
-        console.log(setProps)
         // Prevent unintentional id changes
         if (hasKey(setProps, '_id')) delete setProps._id;
             //if user has socket
@@ -104,7 +103,7 @@ export class dbUtil {
         }
     }
 
-    static async deleteById<T = any>(Model: ModelType<any>, objId: string | ObjectId) {
+    static async deleteById(Model: ModelType<any>, objId: string | ObjectId) {
         try {
             const res: (DeleteResult) = await Model.deleteOne({_id: objId}).exec();
             console.log(res)

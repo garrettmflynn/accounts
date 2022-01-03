@@ -1,8 +1,5 @@
 // GET, POST, PUT, PATCH, DELETE
 
-const SERVER_URI = 'http://localhost:4000' // TODO: To remove and replace with a window variable
-
-
 async function fetchHandler<S,G>(href:string, method: 'POST' | 'GET' | 'PATCH' | 'DELETE' = 'GET', toSend: S | null = null, timeout:boolean|number=false){
 
     const ac = new AbortController();
@@ -35,7 +32,7 @@ async function fetchHandler<S,G>(href:string, method: 'POST' | 'GET' | 'PATCH' |
     return { type: 'SUCCESS' as const, data: await res.json() as G };
 }
 
-export async function getData<G>(route: string, mainURI = SERVER_URI) {
+export async function getData<G>(route: string, mainURI:string) {
     try {
         const uri = new URL(route, mainURI);
         return await fetchHandler<null, G>(uri.href, 'GET');
@@ -45,7 +42,7 @@ export async function getData<G>(route: string, mainURI = SERVER_URI) {
     }
 }
 
-export async function postData<S, G>(route: string, send: S, mainURI = SERVER_URI) {
+export async function postData<S, G>(route: string, send: S, mainURI:string) {
     try {
         const uri = new URL(route, mainURI);
         return await fetchHandler<S, G>(uri.href, 'POST', send);
@@ -55,7 +52,7 @@ export async function postData<S, G>(route: string, send: S, mainURI = SERVER_UR
     }
 }
 
-export async function patchData<S, G>(route: string, send: Partial<S>, mainURI = SERVER_URI) {
+export async function patchData<S, G>(route: string, send: Partial<S>, mainURI:string) {
     try {
         const uri = new URL(route, mainURI);
         return await fetchHandler<Partial<S>, G>(uri.href,'PATCH', send);
@@ -65,11 +62,10 @@ export async function patchData<S, G>(route: string, send: Partial<S>, mainURI =
     }
 }
 
-export async function deleteData<S, G>(route: string, mainURI = SERVER_URI) {
+export async function deleteData<S, G>(route: string, mainURI:string) {
     try {
         const uri = new URL(route, mainURI);
-        await fetchHandler<S, G>(uri.href, 'DELETE');
-
+        return await fetchHandler<S, G>(uri.href, 'DELETE');
     } catch(error: any) {
         console.error(route, error);
         return { type: 'ERROR' as const, error };

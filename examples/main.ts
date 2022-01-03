@@ -1,26 +1,36 @@
-import "./init.js";
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
-import mongoose, { Mongoose } from 'mongoose';
-import { initRoutes } from "../src/backend/controllers/init-routes";
+import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import { getDbURI } from "../src/backend/utils/general.util";
 import * as api from '../src/backend'
 
-const { env } = process;
+// Declare Secret Environment Variables ( based on first argument passed )
+import { resolve } from 'path';
+import {config} from 'dotenv'
+const [arg1, _] = process.argv.slice(2)
+config({path: resolve(__dirname, `../${arg1}.key`)});  
+
+const { env } = process; // Requires env.DB_URI in your specified .key file
 const app = express();
 
 // Parse Body
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connection.on('open', () => console.log(env.DATABASE, 'DB Connected!'));
+// Helper Function to Get DB URI Safely
+function getDbURI(input: string | undefined): string {
+    if (!input) throw new Error('"DB_URI" for "TEST" db not set');
+    else return input
+}
 
-mongoose.connect(getDbURI())
-    .then((m) => run(m))
+// Connect to your local instance of Mongoose
+mongoose.connection.on('open', () => console.log('DB Connected!'));
+
+mongoose.connect(getDbURI(env.DB_URI))
+    .then(run)
     .catch((e) => {
         console.log('\x1b[31m%s\x1b[0m', '\nERROR:', `Couldn't connect to "${env.DATABASE}" DB.\n`);
         console.log('MESSAGE:', e.message);
@@ -30,10 +40,17 @@ mongoose.connect(getDbURI())
         run();
     })
 
-async function run(mongoose?: Mongoose) { 
+async function run() { 
     app.use(cors()); // how to allow data to only intended website without cors
 
-    // Set Websocket Server
+    // Set Routes
+    const router = express.Router();
+    app.use("/", router);
+
+    // Setup API (from @brainsatplay/accounts-node)
+    api.userController(router)
+
+    // Set Server
     let protocol = 'http';
     let server
     const port = process.env.PORT || '80';
@@ -60,14 +77,11 @@ async function run(mongoose?: Mongoose) {
     }
     
     
-    if (mongoose) app.set('mongoose', mongoose.connection.db);
+    // if (mongoose) app.set('mongoose', mongoose.connection.db);
 
     server.listen(parseInt(port), () => {
-      console.log(`Websocket server created on ${protocol}://${`localhost`}:${port}`)
+      console.log(`Server created on ${protocol}://${`localhost`}:${port}`)
     });
-    // Set Routes
-    const router = express.Router();
-    app.use("/", initRoutes(router));
 
     // Start Server
     function listen(port: number) {

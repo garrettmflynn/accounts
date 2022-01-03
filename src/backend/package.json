@@ -1,9 +1,12 @@
 {
   "name": "@brainsatplay/accounts-node",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "FOSS account management system for the Brains@Play ecosystem",
-  "main": "../../dist/backend/index.js",
-  "types": "../../dist/backend/index.d.ts",
+  "main": "./dist/backend/index.js",
+  "types": "./dist/backend/index.d.ts",
+  "files": [
+    "./dist"
+  ],
   "scripts": {
     "start": "cd .. && yarn run backend",
     "build": "tsc"

@@ -7,7 +7,7 @@ import { Api, ApiType } from "./_abstract.api";
 export class AccountsAPI {
   app: Realm.App;
   api: ApiType;
-  currentUser: UserObj | null = null;
+  user: UserObj | null = null;
 
   constructor(appName: string, options: { serverURI: string } = {serverURI: 'http://localhost:4000'}) {
     this.app = new Realm.App(appName); // Initialize your application (MongoDB Realm)
@@ -84,7 +84,7 @@ export class AccountsAPI {
     if (currentUser instanceof Realm.User) {
       const data = await this.getUser(currentUser as any);
       if (data) {
-        this.currentUser = data;
+        this.user = data;
         return { type, data };
       } else return uncaughtError;
     } else return uncaughtError;
@@ -99,7 +99,7 @@ export class AccountsAPI {
 
     try {
       await this.app.currentUser.logOut();
-      this.currentUser = null;
+      this.user = null;
       return { type: "LOGOUT" as const };
     } catch (err) {
       console.log(err);
@@ -176,17 +176,34 @@ export class AccountsAPI {
   };
 
 
-  updateCustomUserData = (update: object) => {
+  updateCustomUserData = async (update: object) => {
+    if (this.app.currentUser && this.user) {
+      for (let key in update) this.user.customUserData[key] = update
+      await this.updateUser()
+    }
+  };
+
+  // Keep client user concurrent with server
+  set = async (key: string, val:any) => {
+    if (this.app.currentUser && this.user) {
+      (this.user as any)[key] = val
+      await this.updateUser()
+    }
+  }
+
+  updateUser = () => {
     return new Promise(async (resolve, reject) => {
-      if (this.app.currentUser && this.currentUser) {
-        Object.assign(this.currentUser.customUserData, update);
+      if (this.app.currentUser && this.user) {
         await this.api
-          .patch(this.app.currentUser.id, this.currentUser)
-          .then((res:any) => resolve(res.data))
+          .patch(this.app.currentUser.id, this.user)
+          .then((res:any) => {
+            this.user = res.data
+            resolve(res.data)
+          })
           .catch(reject);
       } else reject("User not logged in.");
     });
-  };
+  }
 
   private getUser = async (realmUser: RealmUser) => {
     let userRes = await this.api.byId(realmUser.id);

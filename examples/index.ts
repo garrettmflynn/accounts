@@ -1,5 +1,4 @@
-// import * as accounts from '../src/frontend'
-import AccountsAPI from '../src/frontend/dist/frontend'
+import AccountsAPI from '../src/frontend'
 
 const accounts = new AccountsAPI("brainsatplay-tvmdj")
 
@@ -82,7 +81,7 @@ if (logoutButton){
     }
 }
 
-// Set Disconnection Command
+// Set Delete Command
 if (deleteButton){
     deleteButton.onclick = () => {
         accounts.delete().then(() => {

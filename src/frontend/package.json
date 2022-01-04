@@ -2,11 +2,13 @@
   "name": "@brainsatplay/accounts-browser",
   "version": "0.0.4",
   "description": "FOSS account management system for the Brains@Play ecosystem",
-  "main": "./dist/frontend/index.js",
-  "types": "./dist/frontend/index.d.ts",
+  "main": "./dist/accounts.min.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "cd .. && yarn run frontend",
-    "build": "tsc"
+    "build": "webpack --config browser.config.js --mode production"
   },
   "repository": {
     "type": "git",
@@ -19,7 +21,10 @@
   },
   "homepage": "https://github.com/brainsatplay/accounts#readme",
   "devDependencies": {
-    "@brainsatplay/accounts-common": "*"
+    "@brainsatplay/accounts-common": "*",
+    "ts-loader": "^9.2.6",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1"
   },
   "dependencies": {
     "@giveback007/util-lib": "^0.23.1",

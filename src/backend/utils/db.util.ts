@@ -106,7 +106,6 @@ export class dbUtil {
     static async deleteById(Model: ModelType<any>, objId: string | ObjectId) {
         try {
             const res: (DeleteResult) = await Model.deleteOne({_id: objId}).exec();
-            console.log(res)
             if (!res || res.deletedCount == 0) return errorObj({ message: `deleteById: "request not acknowledged. try again.`, objId }, 409);
             
             return successObj(res, 200);

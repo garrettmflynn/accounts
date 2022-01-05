@@ -27,7 +27,13 @@ function handleResult(result: {
         response.status(result.code).json(result)
 }
 
-export function controller(
+export class Controller {
+
+    router: Router
+    model: ModelType<any>
+    route: string
+
+    constructor(
     router: Router,
     Model: ModelType<any>,
     route: string,
@@ -42,6 +48,10 @@ export function controller(
         patch?:      boolean | 'ERROR';
     }
 ) {
+
+    this.router = router
+    this.model = Model
+    this.route = route
     
     const {
         search, getAll, patch,
@@ -51,8 +61,8 @@ export function controller(
     // eg: "/user/search" with 'post'
     if (search) router.post(`${route}/search`, async (req, res) => {
         if (search === 'ERROR') return errRoute('search', res, route);
-
-        const result = await dbUtil.search(Model, req.body);
+    
+        const result = await this.search(req.body)
         return handleResult(result, res);
     });
 
@@ -60,18 +70,19 @@ export function controller(
     if (getAll) router.get(`${route}/all`, async (_, res) => {
         if (getAll === 'ERROR') return errRoute('all', res, route);
 
-        const result = await dbUtil.getAll(Model);
+        const result = await this.getAll()
+
         return handleResult(result, res);
     });
 
-    // eg: "/user/" with 'patch'
+    // eg: "/user/614b800835a020db9fd6ed0e" with 'patch'
     if (patch) router.patch(`${route}/:id`, async (req, res) => {
         if (patch === 'ERROR') return errRoute('patch', res, route);
         //got post from this user,
         //is user live on socket? 
         //yeah okay go through sockets
         const { id } = req.params;
-        const result = await dbUtil.patch(Model, id, req.body);
+        const result = await this.patch(id, req.body)
         return handleResult(result, res);
     });
 
@@ -90,7 +101,7 @@ export function controller(
         if (getById === 'ERROR') return errRoute('get by id', res, route);
 
         const { id } = req.params;
-        const result = await dbUtil.getById(Model, id);
+        const result = await this.getById(id)
         return handleResult(result, res);
     });
 
@@ -99,7 +110,7 @@ export function controller(
         if (deleteById === 'ERROR') return errRoute('delete', res, route);
 
         const { id } = req.params;
-        const result = await dbUtil.deleteById(Model, id);
+        const result = await this.deleteById(id)
         return handleResult(result, res);
     });
 
@@ -109,14 +120,7 @@ export function controller(
 
         const ids: string[] = req.body;
         try {
-            const foundDict: Dict<boolean> = {};
-            const result: Document[] = await Model.find({ '_id': { $in: ids } });
-            result.forEach((doc) => {
-                const id: string = doc._id.toString();
-                foundDict[id] = true;
-            });
-
-            const send = { found: result, fail: ids.filter((id) => !foundDict[id]) }
+            const send = this.getIds(ids)
             return res.status(200).json(send);
         } catch(error: any) {
             return catchRes500(res, error);
@@ -124,15 +128,46 @@ export function controller(
     });
 
     // eg: "/user" with 'post'
-    if (create) router.post(`${route}`, async (req, res) => {
-        if (create === 'ERROR') return errRoute('create', res, route);
+    if (create) router.post(`${route}`,  (req, res) => {
 
-        try {
-            const doc: Document = new Model(req.body);
-            const obj = await doc.save();
-            return res.status(201).json(obj);
-        } catch(error: any) {
-            return catchRes500(res, error);
-        }
+        return new Promise((resolve) => {
+            if (create === 'ERROR') resolve(errRoute('create', res, route));
+
+            this.create(req.body).then(obj => {
+                resolve(res.status(201).json(obj));
+            }).catch(error => {
+                if (error.code === 11000) resolve(catchRes500(res, Object.assign(error, {message: 'Email already in use. Please login using another method.'})));
+                else resolve(catchRes500(res, error));
+            })
+        })
+
     });
+}
+
+search = async (query:any) => await dbUtil.search(this.model, query);
+
+getAll = async () => await dbUtil.getAll(this.model);
+
+patch  = async (id:string, o:any) => await dbUtil.patch(this.model, id, o);
+
+getById  = async (id:string) => await dbUtil.getById(this.model, id);
+
+deleteById  = async (id:string) => await dbUtil.deleteById(this.model, id);
+
+getIds  = async (ids:string[]) => {
+    const foundDict: Dict<boolean> = {};
+    const result: Document[] = await this.model.find({ '_id': { $in: ids } });
+    result.forEach((doc) => {
+        const id: string = doc._id.toString();
+        foundDict[id] = true;
+    });
+
+    return { found: result, fail: ids.filter((id) => !foundDict[id]) }
+}
+
+create = async (o:any) => {
+    const doc: Document = new this.model(o);
+    return await doc.save()
+}
+
 }

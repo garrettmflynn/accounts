@@ -59,7 +59,7 @@ mongoose.connect(process.env.DB_URI)
     app.use("/", router);
 
     // Setup API (from @brainsatplay/accounts-node)
-    api.userController(router)
+    let users = new api.UserController(router)
 
     /* CODE TO START THE SERVER */
 })

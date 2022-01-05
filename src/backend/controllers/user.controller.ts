@@ -27,18 +27,21 @@
 
 import { User } from '../schemas/user.schema';
 import { Router } from 'express';
-import { controller } from './_abstract.controller';
+import { Controller as AbstractController} from './_abstract.controller';
 
-export function userController(router: Router, rt = '/user') {
+export class UserController extends AbstractController {
 
-    controller(router, User, rt, {
-        search: 'ERROR',
-        update: 'ERROR',
-        getById: true,
-        getIds: true,
-        create: true,
-        patch: true,
-        getAll: true,
-        deleteById: true
-    });
+    constructor(router: Router, rt = '/user') {
+        super(router, User, rt, {
+            search: 'ERROR',
+            update: 'ERROR',
+            getById: true,
+            getIds: true,
+            create: true,
+            patch: true,
+            getAll: true,
+            deleteById: true
+        })
+    }
+
 }

@@ -37,7 +37,7 @@ export async function getData<G>(route: string, mainURI:string) {
         const uri = new URL(route, mainURI);
         return await fetchHandler<null, G>(uri.href, 'GET');
     } catch(error: any) {
-        console.error(route, error);
+        console.error(route, error); 
         return { type: 'ERROR' as const, error };
     }
 }

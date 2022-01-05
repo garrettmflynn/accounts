@@ -14,15 +14,15 @@ const fullName = document.getElementById('full-name');
 const customUserData = document.getElementById('custom-user-data');
 
 const testUserDetails = {
-    email: 'test@gmail.com',
+    email: 'garrettmflynn@gmail.com',
     password: 'testingThis'
 }
 
 
 const setProfileInfo = (res:any) => {
     if (!('err' in res.data)){
-        if (profileImage) profileImage.src = res.data.pictureUrl
-        if (fullName) fullName.innerHTML = res.data.fullName
+        if (profileImage) profileImage.src = res.data.image
+        if (fullName) fullName.innerHTML = res.data.firstName + ' ' + res.data.lastName
         if (customUserData) customUserData.innerHTML = JSON.stringify(res.data.customUserData)
     }
 }

@@ -1,5 +1,4 @@
 import { AnyObj } from "@giveback007/util-lib";
-import { BaseObj } from "../common/models/_base.model";
 import { deleteData, getData, patchData, postData } from "./utils/fetch-methods";
 
 export type ApiType = {
@@ -25,7 +24,7 @@ export const Api = <T extends AnyObj>(route: string, serverURI:string) => {
         all: () => 
             getData<T[]>(routeUrl.href + '/all', serverURI),
 
-        create: (obj: Omit<T, keyof BaseObj<any>> & Partial<BaseObj<any>>) =>
+        create: (obj: Partial<T>) =>
             postData<T, T>(route, obj as T, serverURI),
 
         patch: (id: string, obj: Partial<T>) =>

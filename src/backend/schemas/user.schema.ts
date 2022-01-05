@@ -4,12 +4,10 @@ import { model, Schema, Document } from "mongoose";
 const schema = new Schema<UserObj>({
     email: { type: String, required: true, unique: true },
     username: String,
-    userRoles: { type: [String], required: true },
-    missingKeyVals: [String],
-    fullName: String,
     firstName: String,
     lastName: String,
-    pictureUrl: { type: String, required: false },
+    image: { type: String, required: false },
+    identities: [{id:String, providerType: String}],
     customUserData:  { type: Schema.Types.Mixed, required: true }
 }, {
     timestamps: true,

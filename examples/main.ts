@@ -48,7 +48,7 @@ async function run() {
     app.use("/", router);
 
     // Setup API (from @brainsatplay/accounts-node)
-    api.userController(router)
+    let users = new api.UserController(router)
 
     // Set Server
     let protocol = 'http';

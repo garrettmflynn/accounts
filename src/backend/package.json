@@ -2,7 +2,7 @@
   "name": "@brainsatplay/accounts-node",
   "version": "0.0.6",
   "description": "FOSS account management system for the Brains@Play ecosystem",
-  "main": "./dist/backend/index.js",
+  "main": "./index.ts",
   "module": "./dist/backend/index.js",
   "types": "./dist/backend/index.d.ts",
   "files": [

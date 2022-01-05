@@ -82,11 +82,14 @@ export class AccountsAPI {
     }
 
     if (currentUser instanceof Realm.User) {
-      const data = await this.getUser(currentUser as any);
-      if (data) {
-        this.user = data;
-        return { type, data };
-      } else return uncaughtError;
+      const o = await this.getUser(currentUser as any)
+      if (o.data) {
+        this.user = o.data;
+        return { type, data: o.data };
+      } else {
+        if (o.type === "ERROR") return o;
+        else return uncaughtError;
+      }
     } else return uncaughtError;
   };
 
@@ -120,9 +123,7 @@ export class AccountsAPI {
     else console.error("Token information not provided.");
   };
 
-  resetPassword = async (auth: AccountInfoType) =>
-    await this.app.emailPasswordAuth.sendResetPasswordEmail(auth.email);
-
+  resetPassword = async (auth: AccountInfoType) => await this.app.emailPasswordAuth.sendResetPasswordEmail(auth.email).then(res => res).catch((e) => e)
 
   // From Auth.ts
   confirmUserFromURL = async (url: URL = new URL(window.location.href)) => {
@@ -151,13 +152,7 @@ export class AccountsAPI {
           "the user followed a confirmation email link"
       );
 
-    try {
-      await this.app.emailPasswordAuth.resetPassword(password, token, tokenId);
-      return true;
-    } catch (e) {
-      console.log("Couldn't reset password", e);
-      return false;
-    }
+      return await this.app.emailPasswordAuth.resetPassword(token, tokenId, password).then(res => res).catch((e) => e)
   };
 
   //  ---------------------------------------- Original API Methods ----------------------------------------
@@ -178,24 +173,22 @@ export class AccountsAPI {
 
   updateCustomUserData = async (update: object) => {
     if (this.app.currentUser && this.user) {
-      for (let key in update) this.user.customUserData[key] = update
-      await this.updateUser()
+      let customUserData = JSON.parse(JSON.stringify(this.user.customUserData))
+      for (let key in update) customUserData[key] = update
+      await this.updateUser(customUserData)
     }
   };
 
   // Keep client user concurrent with server
   set = async (key: string, val:any) => {
-    if (this.app.currentUser && this.user) {
-      (this.user as any)[key] = val
-      await this.updateUser()
-    }
+    await this.updateUser({[key]: val})
   }
 
-  updateUser = () => {
+  updateUser = (update:Partial<UserObj>) => {
     return new Promise(async (resolve, reject) => {
       if (this.app.currentUser && this.user) {
         await this.api
-          .patch(this.app.currentUser.id, this.user)
+          .patch(this.app.currentUser.id, update)
           .then((res:any) => {
             this.user = res.data
             resolve(res.data)
@@ -206,7 +199,7 @@ export class AccountsAPI {
   }
 
   private getUser = async (realmUser: RealmUser) => {
-    let userRes = await this.api.byId(realmUser.id);
+    let userRes = await this.api.byId(realmUser.id)
 
     if (!userRes.data) {
       userRes = await (async () => {
@@ -216,21 +209,20 @@ export class AccountsAPI {
           email: profile?.email,
           firstName: profile?.firstName,
           lastName: profile?.lastName,
-          pictureUrl: profile?.pictureUrl,
-          fullName: profile?.name,
+          image: profile?.pictureUrl,
           identities: realmUser.identities,
           _id: realmUser.id,
         });
 
-        return await this.api.create(send);
-      })();
+        return await this.api.create(send)
+      })()
     }
 
     if (userRes.type === "ERROR" || !userRes.data) {
-      console.error("Failed on: initializeCurrentUser(RealmUser)");
-      return false;
+      console.error("Failed on: getUser(RealmUser)");
+      throw userRes
     }
 
-    return userRes.data;
+    return userRes;
   };
 }

@@ -8,10 +8,6 @@
 - [x] Add arbitrary fields to your users in `customUserData`
 - [x] Delete user data from database
 
-- [ ] Integrate into the main Brains@Play site
-- [ ] Publish on NPM
-- [ ] Linking accounts across different authorization types
-
 ### Quick Start
 [Install Node LTS](https://nodejs.org/en/download/) (v16 as of writing).
 
